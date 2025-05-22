@@ -41,7 +41,41 @@
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 
+typedef unsigned int RK_U32;
+
 #define MAX_SOC_NAME_LENGTH 128
+#define DRM_FORMAT_INVALID  0 
+
+/*
+ * Arm Framebuffer Compression (AFBC) modifiers
+ *
+ * AFBC is a proprietary lossless image compression protocol and format.
+ * It provides fine-grained random access and minimizes the amount of data
+ * transferred between IP blocks.
+ *
+ * AFBC has several features which may be supported and/or used, which are
+ * represented using bits in the modifier. Not all combinations are valid,
+ * and different devices or use-cases may support different combinations.
+ *
+ * Further information on the use of AFBC modifiers can be found in
+ * Documentation/gpu/afbc.rst
+ */
+
+/*
+ * The top 4 bits (out of the 56 bits alloted for specifying vendor specific
+ * modifiers) denote the category for modifiers. Currently we have three
+ * categories of modifiers ie AFBC, MISC and AFRC. We can have a maximum of
+ * sixteen different categories.
+ */
+#define DRM_FORMAT_MOD_ARM_CODE(__type, __val) \
+        fourcc_mod_code(ARM, ((__u64)(__type) << 52) | ((__val) & 0x000fffffffffffffULL))
+
+#define DRM_FORMAT_MOD_ARM_TYPE_AFBC 0x00
+#define DRM_FORMAT_MOD_ARM_TYPE_MISC 0x01
+
+#define DRM_FORMAT_MOD_ARM_AFBC(__afbc_mode) \
+        DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_AFBC, __afbc_mode)
+
 
 typedef struct RKMPPDecContext {
     AVClass       *class;
