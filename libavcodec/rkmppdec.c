@@ -825,6 +825,8 @@ static int rkmpp_get_frame(AVCodecContext *avctx, AVFrame *frame, int timeout)
             mpp_frame_deinit(&mpp_frame);
             return rkmpp_get_frame(avctx, frame, MPP_TIMEOUT_MAX);
         }
+        /* A format notification does not produce an output frame. */
+        ret = AVERROR(EAGAIN);
         goto exit;
     } else {
         av_log(avctx, AV_LOG_DEBUG, "Received a frame\n");
